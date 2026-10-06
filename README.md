@@ -89,6 +89,7 @@ backend generation metadata. It records the case-file hash, policy hash,
 model configuration hash, optional adapter weight hash, installed runtime
 versions and weight filenames/sizes; full model weight hashes are not recorded.
 MLX peak memory is the process peak, not an isolated measurement for each case.
+Before model loading or evaluation, the CLI refuses report paths that resolve to the input cases file, including symlink aliases.
 
 The report counts:
 

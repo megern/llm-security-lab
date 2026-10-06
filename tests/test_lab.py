@@ -5,6 +5,8 @@ import io
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import types
 import unittest
@@ -245,6 +247,54 @@ class ReportingTests(unittest.TestCase):
                 status = main(["evaluate", "--backend", "fixture", "--cases", str(CASES), "--output", directory])
             self.assertEqual(status, 0)
             self.assertFalse(json.loads((Path(directory) / "report.json").read_text())["is_llm_evidence"])
+
+    def test_cli_report_destinations_preserve_cases_and_symlink_aliases(self):
+        for filename in ("report.json", "report.md"):
+            for alias_mode in ("same_file", "report_symlink", "directory_symlink"):
+                with self.subTest(filename=filename, alias_mode=alias_mode), tempfile.TemporaryDirectory() as directory:
+                    scratch = Path(directory)
+                    output = scratch / "reports"
+                    output.mkdir()
+                    source = output / filename if alias_mode != "report_symlink" else scratch / "cases.jsonl"
+                    original = (json.dumps(attack()) + "\n").encode()
+                    source.write_bytes(original)
+                    if alias_mode == "report_symlink":
+                        (output / filename).symlink_to(source)
+                    elif alias_mode == "directory_symlink":
+                        output_alias = scratch / "output-alias"
+                        output_alias.symlink_to(output, target_is_directory=True)
+                        output = output_alias
+                    env = dict(os.environ, PYTHONPATH=str(PROJECT / "src"), PYTHONDONTWRITEBYTECODE="1")
+                    result = subprocess.run(
+                        [sys.executable, "-B", "-m", "llm_security_lab", "evaluate",
+                         "--backend", "fixture", "--cases", str(source), "--output", str(output)],
+                        env=env, capture_output=True, text=True, check=False,
+                    )
+                    self.assertEqual(result.returncode, 2)
+                    self.assertIn("must not overwrite", result.stderr)
+                    self.assertEqual(source.read_bytes(), original)
+                    other = "report.md" if filename == "report.json" else "report.json"
+                    self.assertFalse((output / other).exists())
+                    if alias_mode == "report_symlink":
+                        self.assertTrue((output / filename).is_symlink())
+
+    def test_overwrite_rejected_before_loading_or_evaluation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "report.json"
+            original = (json.dumps(attack()) + "\n").encode()
+            source.write_bytes(original)
+            with patch("llm_security_lab.cli.load_cases") as loader, \
+                    patch("llm_security_lab.cli.LocalMLXBackend") as backend, \
+                    patch("llm_security_lab.cli.evaluate") as runner, \
+                    contextlib.redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as error:
+                    main(["evaluate", "--model", "/unused/local/model", "--cases", str(source),
+                          "--output", directory])
+                self.assertEqual(error.exception.code, 2)
+                loader.assert_not_called()
+                backend.assert_not_called()
+                runner.assert_not_called()
+            self.assertEqual(source.read_bytes(), original)
 
 
 if __name__ == "__main__":

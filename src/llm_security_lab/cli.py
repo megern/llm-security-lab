@@ -36,6 +36,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.backend == "fixture" and (args.model or args.adapter):
         parser.error("Fixture does not accept a model or adapter")
     try:
+        input_path = args.cases.resolve()
+        output_directory = args.output.expanduser().resolve()
+        report_paths = {
+            (output_directory / filename).resolve()
+            for filename in ("report.json", "report.md")
+        }
+        if input_path in report_paths:
+            parser.error("Report output must not overwrite the input cases file, including symlink aliases.")
         cases = load_cases(args.cases)
         digest = hashlib.sha256(args.cases.read_bytes()).hexdigest()
         backend = FixtureBackend() if args.backend == "fixture" else LocalMLXBackend(
@@ -52,4 +60,3 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Completed {report['summary']['cases_completed']}/{len(cases)} cases")
     print(f"JSON: {json_path}\nMarkdown: {md_path}")
     return 1 if report["summary"]["cases_failed"] else 0
-
