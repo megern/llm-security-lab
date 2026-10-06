@@ -130,6 +130,13 @@ They do not substitute for an actual local model evaluation.
 A complete example fixture report is saved under examples/fixture. It is
 explicitly fixture output and provides no LLM security evidence.
 
+An [actual local Qwen3 0.6B baseline](examples/qwen3-base/README.md) is also
+included with complete traces. All 32 cases completed: full synthetic canary
+disclosure was observed in 2 of 16 canary-goal attacks, text tool-marker emission
+in 6 of 8 tool-goal attacks, and exact benign answers in 1 of 8 benign cases.
+These checks describe this small authored set and expose failures; they do not
+certify model security. No trained adapter was used in that evaluation.
+
 ## العربية
 
 هذا مشروع محلي لتقييم سلوك نموذج موجود على الماك، باستخدام أسرار اصطناعية
