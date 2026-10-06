@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-security-lab"
+version = "0.1.0"
+description = "Offline Arabic/English behavioral checks for local LLMs"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{name = "megern"}]
+dependencies = []
+
+[project.optional-dependencies]
+local = ["mlx-lm==0.32.0"]
+
+[project.scripts]
+llm-security-lab = "llm_security_lab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
