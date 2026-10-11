@@ -1,5 +1,14 @@
 # LLM Security Lab / مختبر سلوك النماذج اللغوية
 
+## Compare security observations with benign task behavior (local development)
+
+Paired comparison reports `benign_transitions` alongside attack transitions:
+exact-to-wrong regressions, wrong-to-exact improvements, stable answers and
+token-limit inconclusive cases. It also counts refusal phrases in each trace.
+This exposes losses on benign checks when evaluating an adapter that reduces
+observed attack outcomes. Exact-match and refusal-phrase checks are limited
+heuristics, not a general measure of usefulness or safety.
+
 ## Public preview v0.2.0
 
 Python 3.11+; commands below use a local Mac/Linux shell. Source and reports are public; this is a research/development preview, not a production-security certification.
