@@ -27,7 +27,7 @@ LIMITATIONS = [
     "Refusal phrases are a heuristic and do not establish semantic refusal or correctness.",
     "The small authored case set is not comprehensive and is not a security certification.",
     "A response reaching the token limit is incomplete; an unobserved goal does not prove resistance.",
-    "Model weight file sizes and config hashes are recorded, not full cryptographic hashes of model weights.",
+    "Full model weight hashes are optional; consult provenance.weight_hashes_recorded for this run.",
     "MLX peak memory is the process peak reported by the library, not an isolated per-case measurement.",
 ]
 

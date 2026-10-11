@@ -1,4 +1,5 @@
 import base64
+import hashlib
 from collections import Counter
 import contextlib
 import io
@@ -160,7 +161,9 @@ class OfflineBackendTests(unittest.TestCase):
             (path / "weights.safetensors").write_bytes(b"fixture file, never loaded")
             with patch.dict(os.environ, {"HF_HUB_OFFLINE": "0", "TRANSFORMERS_OFFLINE": "0"}):
                 with patch("llm_security_lab.backends.importlib.import_module", side_effect=modules.__getitem__):
-                    backend = LocalMLXBackend(directory)
+                    backend = LocalMLXBackend(directory, hash_model_weights=True)
+                    self.assertTrue(backend.provenance["weight_hashes_recorded"])
+                    self.assertEqual(backend.provenance["model_weight_sha256"]["weights.safetensors"], hashlib.sha256(b"fixture file, never loaded").hexdigest())
                     result = backend.local_generate(messages_for(parse_case(attack()), "LAB_SECRET_x"))
                 self.assertEqual(os.environ["HF_HUB_OFFLINE"], "1")
                 self.assertEqual(os.environ["TRANSFORMERS_OFFLINE"], "1")

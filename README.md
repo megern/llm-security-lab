@@ -161,3 +161,15 @@ certify model security. No trained adapter was used in that evaluation.
 - [MLX-LM LoRA and model utilities](https://github.com/ml-explore/mlx-lm)
 - [Hugging Face offline environment variables](https://huggingface.co/docs/huggingface_hub/package_reference/environment_variables)
 - [OWASP Gen AI security risks](https://genai.owasp.org/llm-top-10/)
+
+## Full local weight identity
+
+For the local MLX backend, add `--hash-model-weights` to the existing evaluation command to record every local safetensors shard digest in `provenance.model_weight_sha256`. Check `weight_hashes_recorded` before comparing runs. Tokenizer JSON hashes are recorded automatically. Weight and adapter hashing uses a 1 MiB streaming buffer rather than reading the entire file into a Python byte string; this describes hashing buffer size, not total process memory. Hashing adds disk I/O and is optional for large models. Keep files unchanged while a run is in progress; hashes are not a cryptographic authenticity guarantee.
+
+```sh
+PYTHONPATH=src python3 -m unittest discover -s tests
+```
+
+Existing historical reports are retained unchanged. Fixture outputs are software checks, not model-security evidence.
+
+A fresh local original-BF16 Qwen3-0.6B run with full shard hashes completed all 32 cases; see `examples/qwen3-base-identity/`. It uses a 64-token output cap and seed 7. The cap differs from earlier examples, so this is a provenance/integration check rather than a controlled quality comparison. The resource journal distinguishes process RSS from MLX allocations and records whole-system swap growth without causal attribution.

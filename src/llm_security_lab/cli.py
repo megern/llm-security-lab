@@ -20,6 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--max-tokens", type=int, default=128)
     command.add_argument("--max-input-tokens", type=int, default=2048)
     command.add_argument("--temperature", type=float, default=0.0)
+    command.add_argument("--hash-model-weights", action="store_true", help="Stream full local weight hashes into provenance")
     command.add_argument("--seed", type=int, default=7)
     return parser
 
@@ -49,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         backend = FixtureBackend() if args.backend == "fixture" else LocalMLXBackend(
             args.model, adapter_path=args.adapter, max_tokens=args.max_tokens,
             max_input_tokens=args.max_input_tokens,
-            temperature=args.temperature, seed=args.seed,
+            temperature=args.temperature, seed=args.seed, hash_model_weights=args.hash_model_weights,
         )
         report = evaluate(backend, cases, dataset_sha256=digest, seed=args.seed)
         json_path, md_path = write_report(report, args.output)

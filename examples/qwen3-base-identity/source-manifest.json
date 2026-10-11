@@ -1,0 +1,11 @@
+{
+  "source_sha256": {
+    "src/llm_security_lab/backends.py": "8951ac118f08857c85280b2eea5a3979d8227678497f53463f389849707de294",
+    "src/llm_security_lab/cli.py": "ff65027edb7c736404ca0779d966d553fad356a925b45e3a08edd24851ed49bd",
+    "src/llm_security_lab/evaluate.py": "295879573bb1975a899fc4e1f696c84c24d50748d74dc4a02ab5035dd3a3a7e0",
+    "src/llm_security_lab/cases.py": "da55b9d320d6291d04664c5e896669bdce96faab5fd6a2d1e60bf4038c03fbb6",
+    "src/llm_security_lab/checks.py": "d25d22255bf7e1311816d788394588c54fb9e62dc492a1418cfa8268483e58fb",
+    "cases/bilingual.jsonl": "fbdf9dceaf272b766836b64f52d47da0f43db6071bee4bfa652a173b199e524d"
+  },
+  "scope": "Source snapshot recorded after the completed local run; not a prospectively frozen protocol. Original BF16 Qwen3-0.6B, 64 output-token limit, seed 7. Token limit differs from older examples; no direct quality comparison."
+}

@@ -67,13 +67,21 @@ def enforce_offline() -> None:
     os.environ["DO_NOT_TRACK"] = "1"
 
 
+def sha256_file(path: Path) -> str:
+    hasher = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
 class LocalMLXBackend:
     name = "mlx"
     evidence_label = "measured local LLM outputs; narrow heuristic checks only"
 
     def __init__(self, model_path: str, *, adapter_path: str | None = None,
                  max_tokens: int = 128, max_input_tokens: int = 2048,
-                 temperature: float = 0.0, seed: int = 7):
+                 temperature: float = 0.0, seed: int = 7, hash_model_weights: bool = False):
         path = require_local_directory(model_path)
         adapter = require_local_directory(adapter_path, adapter=True) if adapter_path else None
         enforce_offline()
@@ -105,13 +113,13 @@ class LocalMLXBackend:
         self.provenance = {
             "model_path": str(path),
             "adapter_path": str(adapter) if adapter else None,
-            "adapter_weights_sha256": hashlib.sha256(
-                (adapter / "adapters.safetensors").read_bytes()
-            ).hexdigest() if adapter else None,
+            "adapter_weights_sha256": sha256_file(adapter / "adapters.safetensors") if adapter else None,
             "model_config_sha256": hashlib.sha256((path / "config.json").read_bytes()).hexdigest(),
             "weight_files": [{"name": p.name, "bytes": p.stat().st_size}
                              for p in sorted(path.glob("*.safetensors"))],
-            "weight_hashes_recorded": False,
+            "weight_hashes_recorded": hash_model_weights,
+            "model_weight_sha256": {p.name: sha256_file(p) for p in sorted(path.glob("*.safetensors"))} if hash_model_weights else {},
+            "tokenizer_sha256": {p.name: sha256_file(p) for p in sorted(path.glob("tokenizer*.json"))},
             "runtime_versions": runtime_versions,
             "seed": seed,
             "temperature": temperature,
