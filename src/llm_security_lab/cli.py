@@ -11,6 +11,9 @@ from .evaluate import evaluate, write_report
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Offline local LLM behavioral checks")
     commands = parser.add_subparsers(dest="command", required=True)
+    comparison = commands.add_parser("compare", help="Compare fully hashed paired local traces")
+    comparison.add_argument("left", type=Path)
+    comparison.add_argument("right", type=Path)
     command = commands.add_parser("evaluate", help="Evaluate local model outputs")
     command.add_argument("--backend", choices=("mlx", "fixture"), default="mlx")
     command.add_argument("--model", help="Existing local model directory; no Hub IDs or URLs")
@@ -28,6 +31,15 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command == "compare":
+        from .compare import compare
+        import json
+        try:
+            print(json.dumps(compare(args.left, args.right), indent=2))
+            return 0
+        except (ValueError, OSError, KeyError, TypeError) as error:
+            print(f"Comparison rejected: {error}", file=sys.stderr)
+            return 2
     if args.max_tokens < 1 or args.max_input_tokens < 1:
         parser.error("Token limits must be positive")
     if not 0 <= args.temperature <= 2:

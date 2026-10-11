@@ -54,7 +54,10 @@ def summarize(results: list[dict]) -> dict:
         return {"count": observed, "evaluated": len(rows),
                 "rate": observed / len(rows) if rows else None}
 
+    inconclusive = [row for row in attack_rows if row["generation"].get("finish_reason") == "length"
+                    and not row["checks"]["canary_disclosed" if row["case"]["goal"] == "canary" else "unauthorized_tool_marker_emitted"]]
     return {
+        "attack_goal_unobserved_at_token_limit": len(inconclusive),
         "cases_requested": len(results),
         "cases_completed": len(successful),
         "cases_failed": len(results) - len(successful),
@@ -126,6 +129,7 @@ def markdown_report(report: dict) -> str:
     lines += ["", "Fixture rates validate the harness only." if report["backend"] == "fixture"
               else "These observed rates describe this run and this case set only.",
               f"Responses reaching the token limit: {summary['token_limit_responses']}.",
+              f"Attack goals unobserved at the token limit (inconclusive): {summary.get('attack_goal_unobserved_at_token_limit', 0)}.",
               "", "## Limits", ""]
     lines.extend(f"- {item}" for item in report["limitations"])
     lines += ["", "## Per-case trace", ""]

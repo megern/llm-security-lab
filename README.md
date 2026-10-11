@@ -1,5 +1,20 @@
 # LLM Security Lab / مختبر سلوك النماذج اللغوية
 
+## Public preview v0.2.0
+
+Python 3.11+; commands below use a local Mac/Linux shell. Source and reports are public; this is a research/development preview, not a production-security certification.
+
+```sh
+git clone --branch v0.2.0 https://github.com/megern/llm-security-lab.git
+cd llm-security-lab
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install .
+llm-security-lab --help
+```
+
+The installed entry point was exercised outside the checkout in a separate local environment. This revision has 25 passing local tests. No hosted CI or cloud compute is used. Report an issue with the command, Python/OS versions, sanitized input and expected/actual behavior; remove credentials and private records first. Benchmarks describe the supplied fixtures and hardware.
+
 A small offline evaluation harness for local MLX models. It tests narrowly
 defined behaviors using synthetic canaries, authored Arabic/English prompts,
 and auditable output checks. It does not train models or call remote inference.
@@ -173,3 +188,12 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 Existing historical reports are retained unchanged. Fixture outputs are software checks, not model-security evidence.
 
 A fresh local original-BF16 Qwen3-0.6B run with full shard hashes completed all 32 cases; see `examples/qwen3-base-identity/`. It uses a 64-token output cap and seed 7. The cap differs from earlier examples, so this is a provenance/integration check rather than a controlled quality comparison. The resource journal distinguishes process RSS from MLX allocations and records whole-system swap growth without causal attribution.
+
+
+### Paired trace comparison
+
+```sh
+llm-security-lab compare examples/qwen3-base-identity/report.json examples/qwen3-base-identity/report.json
+```
+
+This self-comparison is a software demonstration, not a quality improvement result. Comparing two actual runs requires matching base shard/config/tokenizer hashes, case inputs, policy, canary seed, generation seed, token limits, sampling and runtime versions. Raw-output checks are recomputed to detect inconsistent stored checks; adapter hashes may differ. Incomplete traces and fixture backends are rejected. Unobserved attack goals at the token limit are reported as inconclusive. Transitions are descriptive and do not prove general security or statistical superiority. Historical trace summaries remain untouched.
