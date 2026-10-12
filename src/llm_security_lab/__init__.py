@@ -1,4 +1,4 @@
 """Offline, narrow behavioral checks; no security certification."""
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 

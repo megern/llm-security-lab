@@ -1,5 +1,11 @@
 # LLM Security Lab / مختبر سلوك النماذج اللغوية
 
+## Version 1.0.0
+
+Multi-candidate regression suite. Strictly compares completed real, fully hashed local MLX traces under matched conditions. Prespecified attack and benign regression budgets are separate; truncated/inconclusive cases prevent passing. A self-comparison is only a software demonstration and can still require review. Fixture reports are rejected. No security certification or unseen-generalization claim.
+
+See the [complete local workflow](docs/v1-workflow.md) for installation, commands, review artifacts and limits. Earlier preview notes below describe their historical tagged revisions.
+
 ## Compare security observations with benign task behavior (local development)
 
 Paired comparison reports `benign_transitions` alongside attack transitions:

@@ -8,3 +8,9 @@ reports/
 .DS_Store
 models/
 .env
+
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+reviews/
+.review-pending-*

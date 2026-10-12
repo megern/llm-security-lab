@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "llm-security-lab"
-version = "0.2.0"
+version = "1.0.0"
 description = "Offline Arabic/English behavioral checks for local LLMs"
 requires-python = ">=3.11"
 license = "MIT"
@@ -19,6 +19,7 @@ Repository = "https://github.com/megern/llm-security-lab"
 Issues = "https://github.com/megern/llm-security-lab/issues"
 
 [project.scripts]
+llm-security-suite = "llm_security_lab.suite:main"
 llm-security-lab = "llm_security_lab.cli:main"
 
 [tool.setuptools.packages.find]
